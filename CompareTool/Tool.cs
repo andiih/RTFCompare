@@ -30,7 +30,8 @@ namespace CompareTool
 
         public void Process(string sDir)
         {
-            _files = ReadDir(sDir);//Read in the list of files
+            string[] supportedTypes =  {"txt", "rtf"};
+            _files = ReadDir(sDir,supportedTypes);//Read in the list of files
             var extractor = new RTFExtractor();
             foreach (var file in _files)
             {
@@ -40,19 +41,20 @@ namespace CompareTool
         }
 
 
-        private List<File> ReadDir(string sDir)
+        private List<File> ReadDir(string sDir, string[] extensions)
         {
             var res = new List<File>();
             try
             {
                 foreach (string f in Directory.GetFiles(sDir))
                 {
-                    res.Add(new File(f));
+                    var ext = f.Split('.').LastOrDefault().ToLower();
+                    if (extensions.Contains(ext)) res.Add(new File(f));
                 }
 
                 foreach (string d in Directory.GetDirectories(sDir))
                 {
-                    res.AddRange(ReadDir(d));
+                    res.AddRange(ReadDir(d,extensions));
                 }
             }
             catch (System.Exception excpt)
