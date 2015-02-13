@@ -12,6 +12,11 @@ namespace RTFCompare
     {
         static void Main(string[] args)
         {
+            if (!args.Any())
+            {
+                Console.WriteLine("Usage : RTFCompare folder");
+                return;
+            }
             var folder = args[0];
             var tool = new Tool();
 
