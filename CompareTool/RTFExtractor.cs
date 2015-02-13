@@ -24,18 +24,27 @@ namespace CompareTool
 
         public string ExtractText(File file)
         {
-            if (file.IsRTF())
+            try
             {
-                var rtfText = file.TextContent();
-                _rtBox.Rtf = rtfText;
-                return _rtBox.Text;
+                if (file.IsRTF())
+                {
+                    var rtfText = file.TextContent();
+                    _rtBox.Rtf = rtfText;
+                    return _rtBox.Text;
 
+                }
+                if (file.IsTXT())
+                {
+                    return file.TextContent();
+                }
+                file.Skipped = true;
+                return "";
             }
-            if (file.IsTXT())
+            catch
             {
-                return file.TextContent();
+                file.Skipped = true;
+                return "";
             }
-            throw new Exception("File type not implemented");
         }
     }
 }

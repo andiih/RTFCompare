@@ -11,10 +11,12 @@ namespace CompareModel
         public int Id { get; set; }
         public string Path { get; set; }
         public string CheckSum { get; set; }
+        public bool Skipped { get; set; }
 
         public File(string path)
         {
             this.Path = path;
+            Skipped = false;
         }
 
         public bool IsRTF()
@@ -28,17 +30,33 @@ namespace CompareModel
 
         public bool TreatAsBinary()
         {
+            
             return !IsRTF() && !IsTXT();
         }
 
         public string TextContent()
         {
-            return System.IO.File.ReadAllText(Path);
+            try
+            {
+                return System.IO.File.ReadAllText(Path);
+            }
+            catch
+            {
+                Skipped = true;
+                return "";
+            }
         }
 
         public byte[] BinaryContent()
         {
+            try{
             return System.IO.File.ReadAllBytes(Path);
+            }
+            catch
+            {
+                Skipped = true;
+                return null;
+            }        
         }
     }
 }

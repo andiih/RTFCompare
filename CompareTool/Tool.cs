@@ -38,12 +38,14 @@ namespace CompareTool
             string[] supportedTypes =  {"txt", "rtf"};
             _files = ReadDir(sDir,null);//Read in the list of files
             var extractor = new RTFExtractor();
+            int cnt = 0;
             foreach (var file in _files)
             {
                 if (file.TreatAsBinary())
                 {
                     var binaryContent = extractor.ReadBinary(file);
                     file.CheckSum = MakeMd5(binaryContent);
+                    if (string.IsNullOrWhiteSpace(file.CheckSum)) file.Skipped = true;
 
                 }
                 else
@@ -51,7 +53,10 @@ namespace CompareTool
                     var plainContent = extractor.ExtractText(file);
                     file.CheckSum = MakeMd5(plainContent);
                 }
+                cnt++;
+                if (cnt%100==0) Console.Write(".");
             }
+            Console.WriteLine();
             return this;
         }
 
@@ -62,7 +67,7 @@ namespace CompareTool
         public List<List<string>> FindDuplicateFiles()
         {
             if (_files==null) throw new Exception("Call ProcessFiles before calling FindDuplicates");
-            var grps = _files.GroupBy(f => f.CheckSum).Where(g => g.Count() > 1);
+            var grps = _files.Where(f=>!f.Skipped).GroupBy(f => f.CheckSum).Where(g => g.Count() > 1);
             var res = grps.Select(grp => grp.Select(file => file.Path).ToList()).ToList();
             return res;
         } 
@@ -100,8 +105,15 @@ namespace CompareTool
 
         private string MakeMd5(byte[] inputBytes)
         {
-            byte[] hash = _md5.ComputeHash(inputBytes);
-            return BitConverter.ToString(hash).Replace("-", String.Empty);
+            try
+            {
+                byte[] hash = _md5.ComputeHash(inputBytes);
+                return BitConverter.ToString(hash).Replace("-", String.Empty);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
 
