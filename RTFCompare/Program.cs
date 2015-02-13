@@ -14,14 +14,12 @@ namespace RTFCompare
         {
             var folder = args[0];
             var tool = new Tool();
-            tool.Process(folder);
-            var res = tool.DuplicateFiles();
 
-            foreach (var line in res)
+            var res = tool.Process(folder).FindDuplicateFiles();
+
+            foreach (var fileset in res.Select(line => string.Join(",", line)))
             {
-                var fileset= string.Join(",", line);
                 Console.WriteLine(fileset);
-
             }
             Console.ReadLine();
         }

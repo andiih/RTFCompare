@@ -17,18 +17,23 @@ namespace CompareTool
             _rtBox = new System.Windows.Forms.RichTextBox();
         }
 
-        public string Extract(File file)
+        public byte[] ReadBinary(File file)
+        {
+            return file.BinaryContent();
+        }
+
+        public string ExtractText(File file)
         {
             if (file.IsRTF())
             {
-                var rtfText = file.Content();
+                var rtfText = file.TextContent();
                 _rtBox.Rtf = rtfText;
                 return _rtBox.Text;
 
             }
             if (file.IsTXT())
             {
-                return file.Content();
+                return file.TextContent();
             }
             throw new Exception("File type not implemented");
         }

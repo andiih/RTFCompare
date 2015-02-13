@@ -26,9 +26,19 @@ namespace CompareModel
             return (this.Path ?? "").ToLower().EndsWith(".txt");
         }
 
-        public string Content()
+        public bool TreatAsBinary()
+        {
+            return !IsRTF() && !IsTXT();
+        }
+
+        public string TextContent()
         {
             return System.IO.File.ReadAllText(Path);
+        }
+
+        public byte[] BinaryContent()
+        {
+            return System.IO.File.ReadAllBytes(Path);
         }
     }
 }
